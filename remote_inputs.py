@@ -65,7 +65,7 @@ def scan_i2c_buses():
 
 
 class JoystickInputs:
-    def __init__(self, buses):
+    def __init__(self, buses, allow_internal_adc_fallback=False):
         self.ads = None
         for bus, addresses, _, _ in buses:
             if config.REMOTE_ADS1115_ADDRESS in addresses:
@@ -74,14 +74,19 @@ class JoystickInputs:
 
         self.internal_adcs = None
         if self.ads is None:
+            if not allow_internal_adc_fallback:
+                raise RuntimeError(
+                    "ADS1115 not found; remote operation requires the ADS1115"
+                )
             self.internal_adcs = [
                 ADC(Pin(pin_number))
                 for pin_number in config.REMOTE_INTERNAL_ADC_PINS
             ]
             print(
-                "ADS1115 not found; using internal ADC pins {}. "
-                "Roll will report center because only three pins are configured."
-                .format(config.REMOTE_INTERNAL_ADC_PINS)
+                "ADS1115 not found; using internal ADC pins {} only for diagnostics. "
+                "Roll will report center because only three pins are configured.".format(
+                    config.REMOTE_INTERNAL_ADC_PINS
+                )
             )
         else:
             if (

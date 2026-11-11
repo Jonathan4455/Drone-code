@@ -1,0 +1,1 @@
+WIFI_PASSWORD = "replace-with-8-plus-char-password"

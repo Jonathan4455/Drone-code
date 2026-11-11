@@ -9,6 +9,7 @@ from protocol import decode_joystick
 
 
 def start_access_point():
+    config.validate_wifi_password(config.WIFI_PASSWORD)
     ap = network.WLAN(network.AP_IF)
     ap.config(essid=config.WIFI_SSID, password=config.WIFI_PASSWORD)
     ap.active(True)

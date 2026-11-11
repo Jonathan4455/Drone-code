@@ -8,6 +8,7 @@ from protocol import encode_joystick
 
 
 def connect_to_drone_ap():
+    config.validate_wifi_password(config.WIFI_PASSWORD)
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
     wlan.connect(config.WIFI_SSID, config.WIFI_PASSWORD)

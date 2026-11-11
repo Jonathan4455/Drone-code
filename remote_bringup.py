@@ -59,7 +59,7 @@ def main():
                 if expected in addresses:
                     print("Detected {} at 0x{:02X}.".format(name, expected))
 
-        inputs = remote_inputs.JoystickInputs(buses)
+        inputs = remote_inputs.JoystickInputs(buses, allow_internal_adc_fallback=True)
         display = _find_oled(buses)
         source = "ADS1115 AIN0-AIN3" if inputs.ads is not None else "internal ADC"
         print("Reading throttle, yaw, pitch, roll via {}. Press Ctrl-C to stop.".format(source))
@@ -71,14 +71,22 @@ def main():
                     *values
                 )
             )
-            _show_values(display, values)
+            if display is not None:
+                try:
+                    _show_values(display, values)
+                except OSError as error:
+                    print("OLED update failed; continuing without display: {}".format(error))
+                    display = None
             time.sleep_ms(100)
     except KeyboardInterrupt:
         print("\nRemote bring-up stopped.")
     finally:
         try:
             if display is not None:
-                display.deinit()
+                try:
+                    display.deinit()
+                except OSError as error:
+                    print("OLED shutdown warning: {}".format(error))
         finally:
             led.off()
 
