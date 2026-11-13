@@ -1,4 +1,4 @@
-from machine import I2C, Pin
+from machine import I2C, Pin, SoftI2C
 import time
 
 import config
@@ -6,12 +6,13 @@ import config
 
 class MPU6050:
     PWR_MGMT_1 = 0x6B
-    CONFIG = 0x1A
     SMPLRT_DIV = 0x19
+    CONFIG = 0x1A
     GYRO_CONFIG = 0x1B
     ACCEL_CONFIG = 0x1C
-    WHO_AM_I = 0x75
     ACCEL_DATA = 0x3B
+    WHO_AM_I = 0x75
+    VALID_IDENTITIES = (0x68, 0x70, 0x71, 0x72, 0x98)
 
     def __init__(self, i2c, address=config.IMU_ADDRESS):
         self.i2c = i2c
@@ -20,13 +21,15 @@ class MPU6050:
 
         if address not in i2c.scan():
             raise OSError("MPU6050 not found at I2C address 0x{:02x}".format(address))
+
         identity = i2c.readfrom_mem(address, self.WHO_AM_I, 1)[0]
-        if identity != 0x68:
+        if identity not in self.VALID_IDENTITIES:
             raise OSError(
                 "Unexpected MPU6050 identity: 0x{:02x}".format(identity)
             )
 
         i2c.writeto_mem(address, self.PWR_MGMT_1, b"\x00")
+        time.sleep_ms(50)
         i2c.writeto_mem(address, self.CONFIG, b"\x03")
         i2c.writeto_mem(address, self.SMPLRT_DIV, b"\x04")
         i2c.writeto_mem(address, self.GYRO_CONFIG, b"\x00")
@@ -81,10 +84,17 @@ class MPU6050:
 
 
 def create_default_sensor():
-    i2c = I2C(
-        config.IMU_I2C_ID,
-        sda=Pin(config.IMU_SDA_PIN),
-        scl=Pin(config.IMU_SCL_PIN),
-        freq=config.IMU_I2C_FREQUENCY_HZ,
-    )
+    try:
+        i2c = I2C(
+            config.IMU_I2C_ID,
+            sda=Pin(config.IMU_SDA_PIN),
+            scl=Pin(config.IMU_SCL_PIN),
+            freq=config.IMU_I2C_FREQUENCY_HZ,
+        )
+    except ValueError:
+        i2c = SoftI2C(
+            sda=Pin(config.IMU_SDA_PIN),
+            scl=Pin(config.IMU_SCL_PIN),
+            freq=config.IMU_I2C_FREQUENCY_HZ,
+        )
     return MPU6050(i2c)

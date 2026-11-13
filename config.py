@@ -40,9 +40,10 @@ if not 0.0 <= BENCH_THROTTLE_START_FRACTION < 1.0:
     raise ValueError("BENCH_THROTTLE_START_FRACTION must satisfy 0.0 <= value < 1.0")
 MAX_PACKET_BYTES = 32
 
+# Drone IMU I2C settings (Andy's wiring: SDA = 9, SCL = 10)
 IMU_I2C_ID = 0
-IMU_SDA_PIN = 0
-IMU_SCL_PIN = 1
+IMU_SDA_PIN = 9
+IMU_SCL_PIN = 10
 IMU_I2C_FREQUENCY_HZ = 100000
 IMU_ADDRESS = 0x68
 
