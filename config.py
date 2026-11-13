@@ -28,7 +28,8 @@ COMMAND_TIMEOUT_MS = 250
 JOYSTICK_PERIOD_MS = 50
 WIFI_CONNECT_TIMEOUT_MS = 15000
 
-MOTOR_PINS = (16, 17, 18, 19)
+# 4x ESC signal wires on GP10, GP11, GP12, GP13 (Physical Pins 14, 15, 16, 17)
+MOTOR_PINS = (10, 11, 12, 13)
 
 # Confirm this stop pulse and PWM rate with the exact ESC documentation.
 ESC_PWM_HZ = 50
@@ -40,10 +41,10 @@ if not 0.0 <= BENCH_THROTTLE_START_FRACTION < 1.0:
     raise ValueError("BENCH_THROTTLE_START_FRACTION must satisfy 0.0 <= value < 1.0")
 MAX_PACKET_BYTES = 32
 
-# Drone IMU I2C settings (Andy's wiring: SDA = 9, SCL = 10)
-IMU_I2C_ID = 0
-IMU_SDA_PIN = 9
-IMU_SCL_PIN = 10
+# Drone IMU on Physical Pin 9 (GP6 = I2C1 SDA) and Physical Pin 10 (GP7 = I2C1 SCL)
+IMU_I2C_ID = 1
+IMU_SDA_PIN = 6
+IMU_SCL_PIN = 7
 IMU_I2C_FREQUENCY_HZ = 100000
 IMU_ADDRESS = 0x68
 
